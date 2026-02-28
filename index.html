@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SUBike - มหาวิทยาลัยศิลปากร</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap');
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { width:100%; font-family:'Kanit',sans-serif; background:#0f1117; color:#fff; font-size:17px; }
+
+.page { display:none; width:100%; min-height:100vh; flex-direction:column; }
+.page.active { display:flex; animation:fadeUp .4s ease; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+
+:root {
+  --g:#00e676; --g2:#00bcd4; --b:#2196f3;
+  --card:#1a1d2e; --border:rgba(255,255,255,.09); --muted:#9aa3b0;
+  --yellow:#ffc107; --red:#ff5252; --orange:#ff9800;
+}
+
+/* ══════════════ LOGIN ══════════════ */
+#pg-login {
+  background:linear-gradient(135deg,#0f1117,#1a1d2e,#0d1f3c);
+  align-items:center; justify-content:center; position:relative; overflow:hidden;
+}
+#pg-login::before { content:''; position:absolute; width:500px; height:500px; background:radial-gradient(circle,rgba(0,230,118,.09),transparent 70%); top:-150px; left:-150px; }
+#pg-login::after  { content:''; position:absolute; width:380px; height:380px; background:radial-gradient(circle,rgba(33,150,243,.08),transparent 70%); bottom:-80px; right:-80px; }
+.login-card { position:relative; z-index:1; width:460px; max-width:95vw; background:rgba(26,29,46,.92); backdrop-filter:blur(20px); border:1px solid var(--border); border-radius:24px; padding:48px 44px; }
+.login-logo { text-align:center; margin-bottom:36px; }
+.login-logo .logo-icon { font-size:64px; display:block; margin-bottom:8px; }
+.login-logo h1 { font-size:36px; font-weight:700; background:linear-gradient(135deg,var(--g),var(--b)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+.login-logo p { color:var(--muted); font-size:16px; margin-top:6px; }
+.fgrp { margin-bottom:20px; }
+.fgrp label { display:block; font-size:15px; color:var(--muted); margin-bottom:8px; font-weight:500; }
+.fgrp input { width:100%; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:14px; padding:15px 18px; color:#fff; font-size:17px; font-family:'Kanit',sans-serif; outline:none; transition:border-color .3s,box-shadow .3s; }
+.fgrp input:focus { border-color:var(--g); box-shadow:0 0 0 3px rgba(0,230,118,.12); }
+.btn-main { width:100%; margin-top:10px; background:linear-gradient(135deg,var(--g),var(--g2)); border:none; border-radius:14px; padding:17px; color:#0f1117; font-size:18px; font-weight:700; font-family:'Kanit',sans-serif; cursor:pointer; transition:transform .2s,box-shadow .2s; }
+.btn-main:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,230,118,.3); }
+.login-foot { text-align:center; margin-top:20px; font-size:15px; color:var(--muted); }
+.login-foot a { color:var(--g); text-decoration:none; }
+
+/* ══════════════ NAVBAR ══════════════ */
+.navbar { display:flex; align-items:center; justify-content:space-between; padding:16px 28px; background:rgba(26,29,46,.97); backdrop-filter:blur(14px); border-bottom:1px solid var(--border); position:sticky; top:0; z-index:200; flex-shrink:0; }
+.nav-brand { font-size:22px; font-weight:700; background:linear-gradient(135deg,var(--g),var(--b)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+.nav-right { display:flex; align-items:center; gap:12px; font-size:16px; color:var(--muted); }
+.avatar { width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg,var(--g),var(--b)); display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:700; color:#0f1117; }
+.back-btn { background:none; border:1px solid var(--border); border-radius:12px; padding:9px 18px; color:var(--muted); font-family:'Kanit',sans-serif; font-size:16px; cursor:pointer; transition:all .2s; }
+.back-btn:hover { border-color:rgba(255,255,255,.3); color:#fff; }
+
+/* ══════════════ SELECT PAGE ══════════════ */
+#pg-select { background:#0f1117; }
+.page-body { padding:28px; flex:1; overflow-y:auto; }
+.sec-title { font-size:26px; font-weight:700; margin-bottom:8px; }
+.sec-sub { font-size:16px; color:var(--muted); margin-bottom:24px; }
+
+/* Zone summary bar */
+.zone-bar { display:flex; gap:12px; margin-bottom:24px; flex-wrap:wrap; }
+.zone-pill {
+  background:var(--card); border:1px solid var(--border); border-radius:16px;
+  padding:12px 18px; display:flex; align-items:center; gap:10px; flex:1; min-width:160px;
+  cursor:pointer; transition:transform .2s, border-color .25s, box-shadow .25s;
+  user-select:none;
+}
+.zone-pill:hover { transform:translateY(-3px); border-color:rgba(0,230,118,.45); box-shadow:0 8px 24px rgba(0,0,0,.35); }
+.zone-pill.active-zone { border-color:var(--g); background:rgba(0,230,118,.08); box-shadow:0 0 0 2px rgba(0,230,118,.2); }
+.zone-pill .zp-icon { font-size:24px; }
+.zone-pill .zp-info .zp-name { font-size:15px; font-weight:600; }
+.zone-pill .zp-info .zp-count { font-size:13px; color:var(--muted); margin-top:2px; }
+.zone-pill .zp-num { font-size:28px; font-weight:700; color:var(--g); margin-left:auto; }
+.zone-pill .zp-num.zero { color:var(--muted); }
+/* zone section header inside grid */
+.zone-section-header { grid-column:1/-1; display:flex; align-items:center; gap:12px; padding:14px 20px; background:rgba(0,230,118,.07); border:1px solid rgba(0,230,118,.18); border-radius:14px; font-size:18px; font-weight:700; margin-top:8px; }
+.zone-section-header .zsh-icon { font-size:26px; }
+.zone-section-header .zsh-cnt { margin-left:auto; font-size:15px; color:var(--muted); font-weight:400; }
+
+/* Type legend */
+.type-legend { display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap; }
+.type-badge { border-radius:12px; padding:7px 14px; font-size:14px; font-weight:600; display:flex; align-items:center; gap:6px; }
+.type-badge.std  { background:rgba(0,230,118,.12); color:var(--g); border:1px solid rgba(0,230,118,.25); }
+.type-badge.fast { background:rgba(33,150,243,.12); color:#64b5f6; border:1px solid rgba(33,150,243,.25); }
+.type-badge.cargo{ background:rgba(255,152,0,.12); color:var(--orange); border:1px solid rgba(255,152,0,.25); }
+
+/* Tabs */
+.tabs { display:flex; gap:10px; margin-bottom:22px; flex-wrap:wrap; }
+.tab { background:rgba(255,255,255,.05); border:1px solid var(--border); border-radius:22px; padding:8px 20px; font-size:15px; color:var(--muted); cursor:pointer; font-family:'Kanit',sans-serif; transition:all .2s; }
+.tab.on, .tab:hover { background:rgba(0,230,118,.12); border-color:var(--g); color:var(--g); }
+
+/* Bike cards */
+.bike-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(290px,1fr)); gap:20px; }
+.bike-card { background:var(--card); border:1px solid var(--border); border-radius:22px; padding:24px; cursor:default; transition:transform .2s,border-color .3s,box-shadow .3s; position:relative; overflow:hidden; }
+.bike-card::before { content:''; position:absolute; top:0; left:0; right:0; height:4px; background:linear-gradient(90deg,var(--g),var(--b)); opacity:0; transition:opacity .3s; }
+.bike-card.type-fast::before  { background:linear-gradient(90deg,#2196f3,#00bcd4); }
+.bike-card.type-cargo::before { background:linear-gradient(90deg,#ff9800,#ffc107); }
+.bike-card:hover { transform:translateY(-4px); border-color:rgba(0,230,118,.35); box-shadow:0 14px 36px rgba(0,0,0,.35); }
+.bike-card:hover::before { opacity:1; }
+.card-fix { border-color:rgba(255,193,7,.2) !important; }
+.card-fix::before { background:linear-gradient(90deg,#ffc107,#ff9800) !important; opacity:.8 !important; }
+
+.bk-top { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:12px; }
+.bk-emoji { font-size:52px; line-height:1; }
+.bk-type-tag { border-radius:10px; padding:4px 10px; font-size:13px; font-weight:700; }
+.bk-type-tag.std   { background:rgba(0,230,118,.15); color:var(--g); }
+.bk-type-tag.fast  { background:rgba(33,150,243,.15); color:#64b5f6; }
+.bk-type-tag.cargo { background:rgba(255,152,0,.15); color:var(--orange); }
+
+.bk-name { font-size:19px; font-weight:700; margin-bottom:3px; }
+.bk-id   { font-size:14px; color:var(--muted); margin-bottom:4px; }
+.bk-zone { font-size:14px; color:var(--muted); margin-bottom:12px; }
+.bk-zone span { color:#fff; font-weight:600; }
+
+.badge { display:inline-flex; align-items:center; gap:6px; border-radius:20px; padding:5px 14px; font-size:14px; font-weight:500; margin-bottom:16px; }
+.badge.ok   { background:rgba(0,230,118,.12); color:var(--g); }
+.badge.busy { background:rgba(255,82,82,.12); color:var(--red); }
+.badge.fix  { background:rgba(255,193,7,.12); color:var(--yellow); }
+.badge .dot { width:7px; height:7px; border-radius:50%; background:currentColor; animation:pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+.bk-stats { display:flex; gap:0; border:1px solid var(--border); border-radius:14px; overflow:hidden; margin-bottom:0; }
+.bk-stat { flex:1; text-align:center; padding:10px 6px; border-right:1px solid var(--border); }
+.bk-stat:last-child { border-right:none; }
+.bk-stat .v { font-size:16px; font-weight:700; }
+.bk-stat .l { font-size:12px; color:var(--muted); margin-top:2px; }
+
+.btn-pick { width:100%; margin-top:14px; background:linear-gradient(135deg,var(--g),var(--g2)); border:none; border-radius:12px; padding:13px; color:#0f1117; font-size:16px; font-weight:700; font-family:'Kanit',sans-serif; cursor:pointer; transition:transform .2s,box-shadow .2s; }
+.btn-pick.fast-btn  { background:linear-gradient(135deg,#2196f3,#00bcd4); }
+.btn-pick.cargo-btn { background:linear-gradient(135deg,#ff9800,#ffc107); }
+.btn-pick:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(0,0,0,.3); }
+.btn-pick:disabled { background:rgba(255,255,255,.08); color:var(--muted); cursor:not-allowed; transform:none; box-shadow:none; }
+
+/* ══════════════ START PAGE ══════════════ */
+#pg-start { background:linear-gradient(135deg,#0f1117,#0d1f3c); }
+.start-body { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; padding:28px 20px 40px; gap:20px; text-align:center; overflow-y:auto; }
+.bike-hero { background:rgba(26,29,46,.88); border:1px solid var(--border); border-radius:24px; padding:28px 40px; display:flex; flex-direction:column; align-items:center; gap:10px; width:100%; max-width:440px; }
+.hero-emoji { font-size:80px; }
+.hero-name { font-size:22px; font-weight:700; }
+.hero-loc { font-size:15px; color:var(--muted); }
+.hero-zone { font-size:15px; color:#fff; margin-top:2px; }
+
+/* Km highlight panel */
+.km-panel { width:100%; max-width:440px; background:linear-gradient(135deg,rgba(0,230,118,.12),rgba(0,188,212,.08)); border:2px solid rgba(0,230,118,.3); border-radius:20px; padding:22px; text-align:center; }
+.km-panel .kp-label { font-size:15px; color:var(--muted); margin-bottom:8px; }
+.km-panel .kp-main { font-size:52px; font-weight:700; color:var(--g); line-height:1; }
+.km-panel .kp-unit { font-size:18px; color:var(--muted); margin-bottom:12px; }
+.km-panel .kp-price { font-size:22px; font-weight:700; color:#fff; }
+.km-panel .kp-price span { color:var(--g); font-size:28px; }
+.km-panel .kp-rate { font-size:14px; color:var(--muted); margin-top:4px; }
+
+.irow { display:flex; gap:14px; width:100%; max-width:440px; }
+.ibox { flex:1; background:rgba(26,29,46,.85); border:1px solid var(--border); border-radius:16px; padding:16px; text-align:center; }
+.ibox .iv { font-size:21px; font-weight:700; color:var(--g); }
+.ibox .il { font-size:13px; color:var(--muted); margin-top:4px; }
+
+.rules { background:rgba(26,29,46,.65); border:1px solid var(--border); border-radius:16px; padding:20px; width:100%; max-width:440px; text-align:left; }
+.rules h3 { font-size:16px; font-weight:700; color:var(--muted); margin-bottom:12px; }
+.rule { display:flex; gap:10px; margin-bottom:10px; font-size:15px; color:#ccc; align-items:flex-start; line-height:1.5; }
+.rule span:first-child { flex-shrink:0; }
+
+.btn-go { width:100%; max-width:440px; background:linear-gradient(135deg,var(--g),var(--g2)); border:none; border-radius:16px; padding:19px; color:#0f1117; font-size:19px; font-weight:700; font-family:'Kanit',sans-serif; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px; transition:transform .2s,box-shadow .2s; }
+.btn-go:hover { transform:translateY(-2px); box-shadow:0 12px 30px rgba(0,230,118,.35); }
+
+/* ══════════════ PAY PAGE ══════════════ */
+#pg-pay { background:#0f1117; }
+.pay-wrap { max-width:520px; margin:0 auto; padding:28px; }
+.pay-head { text-align:center; margin-bottom:24px; }
+.pay-head .ph-icon { font-size:56px; margin-bottom:10px; }
+.pay-head .ph-title { font-size:26px; font-weight:700; margin-bottom:4px; }
+.pay-head .ph-sub { font-size:16px; color:var(--muted); }
+
+/* KM focus box - big hero on pay page */
+.km-hero-box { background:linear-gradient(135deg,rgba(0,230,118,.12),rgba(0,188,212,.1)); border:2px solid rgba(0,230,118,.3); border-radius:22px; padding:26px 20px; text-align:center; margin-bottom:20px; }
+.km-hero-box .kh-lbl { font-size:15px; color:var(--muted); margin-bottom:6px; }
+.km-hero-box .kh-num { font-size:68px; font-weight:700; color:var(--g); line-height:1; font-variant-numeric:tabular-nums; }
+.km-hero-box .kh-unit { font-size:22px; color:var(--muted); margin-bottom:14px; }
+.km-hero-box .kh-price { font-size:28px; font-weight:700; color:#fff; }
+.km-hero-box .kh-price span { color:var(--g); }
+.km-hero-box .kh-time { font-size:15px; color:var(--muted); margin-top:8px; }
+.km-hero-box .kh-clock { font-variant-numeric:tabular-nums; color:#ccc; }
+
+.rcpt { background:var(--card); border:1px solid var(--border); border-radius:20px; padding:24px; margin-bottom:20px; }
+.rcpt h3 { font-size:17px; font-weight:700; margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid var(--border); }
+.rrow { display:flex; justify-content:space-between; padding:9px 0; font-size:16px; color:#ccc; }
+.rrow.tot { border-top:1px solid var(--border); margin-top:8px; padding-top:16px; font-size:20px; font-weight:700; color:#fff; }
+.green { color:var(--g); }
+.hdiv { height:1px; background:var(--border); margin:10px 0; }
+
+.methods { margin-bottom:20px; }
+.methods h3 { font-size:16px; font-weight:600; color:var(--muted); margin-bottom:12px; }
+.mth-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+.mth-btn { background:rgba(255,255,255,.04); border:2px solid transparent; border-radius:14px; padding:16px 10px; cursor:pointer; text-align:center; font-family:'Kanit',sans-serif; color:#fff; transition:all .2s; }
+.mth-btn .mi { font-size:28px; display:block; margin-bottom:6px; }
+.mth-btn .mn { font-size:14px; color:var(--muted); }
+.mth-btn.on { border-color:var(--g); background:rgba(0,230,118,.08); }
+.mth-btn.on .mn { color:var(--g); }
+.btn-pay { width:100%; background:linear-gradient(135deg,var(--g),var(--g2)); border:none; border-radius:16px; padding:17px; color:#0f1117; font-size:18px; font-weight:700; font-family:'Kanit',sans-serif; cursor:pointer; transition:transform .2s,box-shadow .2s; }
+.btn-pay:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,230,118,.3); }
+
+/* ══════════════ FINISH PAGE ══════════════ */
+#pg-finish { background:linear-gradient(135deg,#0f1117,#0d2600,#0f1117); align-items:center; justify-content:center; }
+.finish-wrap { max-width:500px; width:95%; text-align:center; padding:40px 22px; overflow-y:auto; }
+.ok-ring { width:100px; height:100px; border-radius:50%; background:linear-gradient(135deg,rgba(0,230,118,.18),rgba(0,188,212,.18)); border:2px solid var(--g); display:flex; align-items:center; justify-content:center; font-size:48px; margin:0 auto 24px; animation:popIn .5s cubic-bezier(.34,1.56,.64,1); }
+@keyframes popIn { from{transform:scale(.3);opacity:0} to{transform:scale(1);opacity:1} }
+.fin-title { font-size:30px; font-weight:700; margin-bottom:8px; }
+.fin-sub { font-size:16px; color:var(--muted); margin-bottom:30px; }
+.stats-row { display:flex; gap:12px; margin-bottom:28px; }
+.sbox { flex:1; background:var(--card); border:1px solid var(--border); border-radius:16px; padding:16px 10px; text-align:center; }
+.sbox .sv { font-size:22px; font-weight:700; color:var(--g); }
+.sbox .sl { font-size:13px; color:var(--muted); margin-top:4px; }
+.review-card { background:var(--card); border:1px solid var(--border); border-radius:20px; padding:28px; margin-bottom:22px; }
+.review-card h3 { font-size:18px; font-weight:700; margin-bottom:6px; }
+.review-card p { font-size:15px; color:var(--muted); margin-bottom:20px; }
+.stars { display:flex; gap:10px; justify-content:center; margin-bottom:14px; }
+.star { font-size:44px; cursor:pointer; filter:grayscale(1) brightness(.5); transition:transform .2s,filter .2s; user-select:none; }
+.star:hover, .star.lit { filter:grayscale(0) brightness(1); transform:scale(1.25); }
+.star-lbl { font-size:16px; color:var(--muted); height:24px; margin-bottom:16px; }
+.r-ta { width:100%; height:82px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.12); border-radius:14px; padding:13px 16px; color:#fff; font-size:16px; font-family:'Kanit',sans-serif; resize:none; outline:none; transition:border-color .3s; }
+.r-ta:focus { border-color:var(--g); }
+.btn-done { width:100%; background:linear-gradient(135deg,var(--g),var(--g2)); border:none; border-radius:16px; padding:17px; color:#0f1117; font-size:18px; font-weight:700; font-family:'Kanit',sans-serif; cursor:pointer; transition:transform .2s,box-shadow .2s; }
+.btn-done:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,230,118,.3); }
+
+/* ══════════════ TOAST ══════════════ */
+#toast { position:fixed; bottom:30px; left:50%; transform:translateX(-50%) translateY(90px); background:var(--card); border:1px solid var(--g); border-radius:14px; padding:13px 26px; font-size:16px; display:flex; align-items:center; gap:9px; transition:transform .3s; z-index:9999; white-space:nowrap; }
+#toast.show { transform:translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- ════════════ PAGE 1: LOGIN ════════════ -->
+<div id="pg-login" class="page active">
+  <div class="login-card">
+    <div class="login-logo">
+      <span class="logo-icon">⚡🚲</span>
+      <h1>SUBike</h1>
+      <p>จักรยานไฟฟ้า มหาวิทยาลัยศิลปากร</p>
+    </div>
+    <div class="fgrp">
+      <label>อีเมล หรือ รหัสนักศึกษา / อาจารย์</label>
+      <input id="li-user" type="text" placeholder="student@su.ac.th" value="student@su.ac.th">
+    </div>
+    <div class="fgrp">
+      <label>รหัสผ่าน</label>
+      <input id="li-pass" type="password" placeholder="••••••••" value="123456">
+    </div>
+    <button class="btn-main" onclick="doLogin()">เข้าสู่ระบบ ⚡</button>
+    <div class="login-foot">ยังไม่มีบัญชี? <a href="#">สมัครด้วยบัตรนักศึกษา / อาจารย์</a></div>
+  </div>
+</div>
+
+<!-- ════════════ PAGE 2: SELECT BIKE ════════════ -->
+<div id="pg-select" class="page">
+  <div class="navbar">
+    <div class="nav-brand">⚡ SUBike</div>
+    <div class="nav-right">
+      <span id="nav-uname">สวัสดี</span>
+      <div class="avatar" id="nav-av">ส</div>
+    </div>
+  </div>
+  <div class="page-body">
+    <div class="sec-title">เลือกจักรยาน 🚲</div>
+    <div class="sec-sub" id="avail-sub">📍 มหาวิทยาลัยศิลปากร — กำลังโหลด...</div>
+
+    <!-- Zone summary -->
+    <div class="zone-bar" id="zone-bar"></div>
+
+    <!-- Type legend -->
+    <div class="type-legend">
+      <div class="type-badge std">🚲 ธรรมดา — ฿5/กม.</div>
+      <div class="type-badge fast">⚡ สปีด — ฿10/กม.</div>
+      <div class="type-badge cargo">📦 ขนของ — ฿15/กม.</div>
+    </div>
+
+    <!-- Filter tabs -->
+    <div class="tabs">
+      <button class="tab on" onclick="doFilter(this,'all')">ทั้งหมด</button>
+      <button class="tab" onclick="doFilter(this,'avail')">ว่างอยู่</button>
+      <button class="tab" onclick="doFilter(this,'std')">🚲 ธรรมดา</button>
+      <button class="tab" onclick="doFilter(this,'fast')">⚡ สปีด</button>
+      <button class="tab" onclick="doFilter(this,'cargo')">📦 ขนของ</button>
+      <button class="tab" onclick="doFilter(this,'maintenance')">🔧 ซ่อมอยู่</button>
+    </div>
+
+    <div class="bike-grid" id="bike-grid"></div>
+  </div>
+</div>
+
+<!-- ════════════ PAGE 3: START ════════════ -->
+<div id="pg-start" class="page">
+  <div class="navbar">
+    <button class="back-btn" onclick="goTo('pg-select')">← กลับ</button>
+    <div class="nav-brand">⚡ SUBike</div>
+    <div style="width:80px"></div>
+  </div>
+  <div class="start-body">
+    <div class="bike-hero">
+      <div class="hero-emoji" id="s-emoji">🚲</div>
+      <div class="hero-name" id="s-name">SUBike SU-001</div>
+      <div class="hero-loc" id="s-loc">📍 หน้าคณะจิตรกรรม</div>
+      <div class="hero-zone" id="s-zone">🏢 โซน: คณะจิตรกรรมฯ</div>
+      <div class="badge ok" style="margin-top:6px"><span class="dot"></span> พร้อมใช้งาน</div>
+    </div>
+
+    <!-- KM highlight panel -->
+    <div class="km-panel">
+      <div class="kp-label">💰 อัตราค่าบริการ</div>
+      <div class="kp-main" id="s-rate-num">5</div>
+      <div class="kp-unit">บาท ต่อ กิโลเมตร</div>
+      <div class="kp-price">ขี่ 1 กม. = <span id="s-rate-price">฿5</span></div>
+      <div class="kp-rate" id="s-type-label">จักรยานไฟฟ้าธรรมดา</div>
+    </div>
+
+    <div class="irow">
+      <div class="ibox"><div class="iv" id="s-bat">95%</div><div class="il">🔋 แบตเตอรี่</div></div>
+      <div class="ibox"><div class="iv" id="s-range">40 km</div><div class="il">🛣️ ระยะทาง</div></div>
+      <div class="ibox"><div class="iv" id="s-zone-cnt">—</div><div class="il">🚲 ในโซนนี้</div></div>
+    </div>
+
+    <div class="rules">
+      <h3>📋 กฎการใช้งาน</h3>
+      <div class="rule"><span>🪖</span><span>สวมหมวกกันน็อกทุกครั้งที่ใช้งาน</span></div>
+      <div class="rule"><span>🚦</span><span>ปฏิบัติตามกฎจราจรอย่างเคร่งครัด</span></div>
+      <div class="rule"><span>📌</span><span>คืนจักรยานที่สถานีที่กำหนดเท่านั้น</span></div>
+      <div class="rule"><span>⚡</span><span>ห้ามชาร์จแบตเตอรี่เองโดยไม่ได้รับอนุญาต</span></div>
+      <div class="rule"><span>🚫</span><span>จอดไม่ตรงท่ารถ <strong style="color:#ff5252">ปรับ ฿50</strong> — หากเครดิตไม่พอจะ <strong style="color:#ff5252">ติดลบ -฿50</strong></span></div>
+    </div>
+
+    <button class="btn-go" onclick="startRide()"><span>🔓</span> เริ่มใช้งานเลย!</button>
+  </div>
+</div>
+
+<!-- ════════════ PAGE 4: RIDING ════════════ -->
+<div id="pg-pay" class="page">
+  <div class="navbar">
+    <div class="nav-brand">⚡ SUBike</div>
+    <div class="nav-right"><span style="color:var(--g); font-size:16px;">● กำลังขี่อยู่</span></div>
+  </div>
+  <div class="pay-wrap">
+    <div class="pay-head">
+      <div class="ph-icon">🚴</div>
+      <div class="ph-title">กำลังเดินทาง</div>
+      <div class="ph-sub" id="p-type-sub">จักรยานไฟฟ้าธรรมดา · ฿5/กม.</div>
+    </div>
+
+    <!-- KM HERO — main focus -->
+    <div class="km-hero-box">
+      <div class="kh-lbl">📍 ระยะทางที่ขี่ไปแล้ว</div>
+      <div class="kh-num" id="ride-km">0.00</div>
+      <div class="kh-unit">กิโลเมตร</div>
+      <div class="kh-price">ค่าบริการตอนนี้ <span id="ride-price">฿0.00</span></div>
+      <div class="kh-time">⏱️ เวลา: <span class="kh-clock" id="ride-clock">00:00:00</span></div>
+    </div>
+
+    <div class="rcpt">
+      <h3>🧾 สรุปการเดินทาง</h3>
+      <div class="rrow"><span>จักรยาน</span><span id="p-bike">SUBike SU-001</span></div>
+      <div class="rrow"><span>ระยะเวลา</span><span id="p-dur">0 นาที 0 วินาที</span></div>
+      <div class="rrow"><span>ระยะทาง</span><span id="p-dist">0.00 km</span></div>
+      <div class="rrow"><span>ราคาต่อกิโลเมตร</span><span id="p-rate">฿5.00</span></div>
+      <div class="hdiv"></div>
+      <div class="rrow tot"><span>ยอดรวม</span><span class="green" id="p-total">฿0.00</span></div>
+    </div>
+
+    <div class="methods">
+      <h3>เลือกวิธีชำระเงิน</h3>
+      <div class="mth-grid">
+        <button class="mth-btn on" onclick="pickMethod(this)"><span class="mi">💳</span><span class="mn">บัตรเครดิต</span></button>
+        <button class="mth-btn" onclick="pickMethod(this)"><span class="mi">📱</span><span class="mn">พร้อมเพย์</span></button>
+        <button class="mth-btn" onclick="pickMethod(this)"><span class="mi">🪙</span><span class="mn">เครดิต</span></button>
+      </div>
+    </div>
+    <button class="btn-pay" onclick="doPay()">จอดรถ & ชำระเงิน <span id="p-btn-amt">฿0.00</span> →</button>
+  </div>
+</div>
+
+<!-- ════════════ PAGE 5: FINISH + REVIEW ════════════ -->
+<div id="pg-finish" class="page">
+  <div class="finish-wrap">
+    <div class="ok-ring">✅</div>
+    <div class="fin-title">ชำระเงินสำเร็จ! 🎉</div>
+    <div class="fin-sub">ขอบคุณที่ใช้บริการ SUBike<br>มหาวิทยาลัยศิลปากร</div>
+    <div class="stats-row">
+      <div class="sbox"><div class="sv" id="f-time">0:00</div><div class="sl">⏱️ เวลา</div></div>
+      <div class="sbox"><div class="sv" id="f-dist">0.00 km</div><div class="sl">🛣️ ระยะทาง</div></div>
+      <div class="sbox"><div class="sv" id="f-co2">0.00 kg</div><div class="sl">🌿 CO₂ ลด</div></div>
+    </div>
+    <div class="review-card">
+      <h3>ให้คะแนนการเดินทาง ⭐</h3>
+      <p>ประสบการณ์ของคุณเป็นอย่างไรบ้าง?</p>
+      <div class="stars">
+        <span class="star" onclick="rateStar(1)">⭐</span>
+        <span class="star" onclick="rateStar(2)">⭐</span>
+        <span class="star" onclick="rateStar(3)">⭐</span>
+        <span class="star" onclick="rateStar(4)">⭐</span>
+        <span class="star" onclick="rateStar(5)">⭐</span>
+      </div>
+      <div class="star-lbl" id="star-lbl">แตะดาวเพื่อให้คะแนน</div>
+      <textarea class="r-ta" id="r-txt" placeholder="บอกเราเพิ่มเติม... (ไม่บังคับ)"></textarea>
+    </div>
+    <button class="btn-done" onclick="sendReview()">ส่งรีวิวและเสร็จสิ้น 🎊</button>
+  </div>
+</div>
+
+<div id="toast">✅ <span id="toast-msg"></span></div>
+
+<script>
+// ══════════════ DATA ══════════════
+// type: 'std'=ธรรมดา ฿5/km | 'fast'=สปีด ฿10/km | 'cargo'=ขนของ ฿15/km
+// zone: ชื่อโซน/ตึก
+const BIKES = [
+  // ── โซน คณะจิตรกรรมฯ ──
+  { id:'SU-001', type:'std',   emoji:'🚲', bat:95,  range:40, status:'available',   zone:'คณะจิตรกรรมฯ',    station:'หน้าคณะจิตรกรรม' },
+  { id:'SU-002', type:'std',   emoji:'🚲', bat:72,  range:30, status:'available',   zone:'คณะจิตรกรรมฯ',    station:'หน้าคณะจิตรกรรม' },
+  { id:'SU-003', type:'fast',  emoji:'⚡🚲', bat:88, range:35, status:'available',  zone:'คณะจิตรกรรมฯ',    station:'หน้าคณะจิตรกรรม' },
+  // ── โซน หอสมุด ──
+  { id:'SU-004', type:'std',   emoji:'🚲', bat:61,  range:25, status:'available',   zone:'หอสมุดกลาง',       station:'หน้าหอสมุดกลาง' },
+  { id:'SU-005', type:'cargo', emoji:'📦🚲', bat:80, range:20, status:'available',  zone:'หอสมุดกลาง',       station:'หน้าหอสมุดกลาง' },
+  { id:'SU-006', type:'fast',  emoji:'⚡🚲', bat:100,range:50, status:'available',  zone:'หอสมุดกลาง',       station:'หน้าหอสมุดกลาง' },
+  // ── โซน โรงอาหาร ──
+  { id:'SU-007', type:'std',   emoji:'🚲', bat:55,  range:22, status:'available',   zone:'โรงอาหาร',          station:'หน้าโรงอาหาร' },
+  { id:'SU-008', type:'cargo', emoji:'📦🚲', bat:70, range:18, status:'available',  zone:'โรงอาหาร',          station:'หน้าโรงอาหาร' },
+  { id:'SU-009', type:'std',   emoji:'🚲', bat:90,  range:38, status:'busy',        zone:'โรงอาหาร',          station:'หน้าโรงอาหาร' },
+  // ── โซน คณะสถาปัตย์ ──
+  { id:'SU-010', type:'std',   emoji:'🚲', bat:45,  range:18, status:'available',   zone:'คณะสถาปัตย์',      station:'หน้าคณะสถาปัตย์' },
+  { id:'SU-011', type:'fast',  emoji:'⚡🚲', bat:92, range:42, status:'available',  zone:'คณะสถาปัตย์',      station:'หน้าคณะสถาปัตย์' },
+  { id:'SU-012', type:'cargo', emoji:'📦🚲', bat:65, range:22, status:'busy',       zone:'คณะสถาปัตย์',      station:'หน้าคณะสถาปัตย์' },
+  // ── โซน หอพัก ──
+  { id:'SU-013', type:'std',   emoji:'🚲', bat:30,  range:12, status:'available',   zone:'หอพักนักศึกษา',   station:'หน้าหอพักนักศึกษา' },
+  { id:'SU-014', type:'std',   emoji:'🚲', bat:100, range:50, status:'busy',        zone:'หอพักนักศึกษา',   station:'หน้าหอพักนักศึกษา' },
+  { id:'SU-015', type:'fast',  emoji:'⚡🚲', bat:78, range:33, status:'available',  zone:'หอพักนักศึกษา',   station:'หน้าหอพักนักศึกษา' },
+  // ── โซน ประตูหน้า ──
+  { id:'SU-016', type:'std',   emoji:'🚲', bat:50,  range:20, status:'available',   zone:'ประตูทางเข้า',     station:'ประตูทางเข้าหลัก' },
+  { id:'SU-017', type:'cargo', emoji:'📦🚲', bat:85, range:25, status:'available',  zone:'ประตูทางเข้า',     station:'ประตูทางเข้าหลัก' },
+  // ── กำลังซ่อม ──
+  { id:'SU-018', type:'std',   emoji:'🚲', bat:0,   range:0,  status:'maintenance', zone:'ศูนย์ซ่อมบำรุง',   station:'ศูนย์ซ่อมบำรุง' },
+  { id:'SU-019', type:'fast',  emoji:'⚡🚲', bat:15, range:0,  status:'maintenance', zone:'ศูนย์ซ่อมบำรุง',   station:'ศูนย์ซ่อมบำรุง' },
+  { id:'SU-020', type:'cargo', emoji:'📦🚲', bat:5,  range:0,  status:'maintenance', zone:'ศูนย์ซ่อมบำรุง',   station:'ศูนย์ซ่อมบำรุง' },
+];
+
+const RATE = { std:5, fast:10, cargo:15 };
+const TYPE_LABEL = { std:'จักรยานไฟฟ้าธรรมดา', fast:'จักรยานไฟฟ้าความเร็วสูง', cargo:'จักรยานบรรทุกขนของ' };
+const TYPE_EMOJI = { std:'🚲', fast:'⚡', cargo:'📦' };
+const STARLBL = ['','😕 แย่มาก','😐 พอใช้','🙂 ดี','😊 ดีมาก','🤩 ยอดเยี่ยม!'];
+
+// Unique zones (for zone bar)
+const ZONES = ['คณะจิตรกรรมฯ','หอสมุดกลาง','โรงอาหาร','คณะสถาปัตย์','หอพักนักศึกษา','ประตูทางเข้า'];
+const ZONE_ICONS = { 'คณะจิตรกรรมฯ':'🎨','หอสมุดกลาง':'📚','โรงอาหาร':'🍽️','คณะสถาปัตย์':'🏛️','หอพักนักศึกษา':'🏠','ประตูทางเข้า':'🚪' };
+
+let picked=null, timer=null, secs=0, myRating=0;
+
+/* ── NAVIGATE ── */
+function goTo(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+/* ── TOAST ── */
+function toast(msg) {
+  document.getElementById('toast-msg').textContent = msg;
+  const el = document.getElementById('toast');
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2600);
+}
+
+/* ── LOGIN ── */
+function doLogin() {
+  const u = document.getElementById('li-user').value.trim();
+  const p = document.getElementById('li-pass').value.trim();
+  if (!u || !p) { toast('กรุณากรอกข้อมูลให้ครบ'); return; }
+  const name = u.split('@')[0];
+  document.getElementById('nav-uname').textContent = 'สวัสดี, ' + name;
+  document.getElementById('nav-av').textContent = name.charAt(0).toUpperCase();
+  toast('เข้าสู่ระบบสำเร็จ! ยินดีต้อนรับ 🎉');
+  setTimeout(() => { buildZoneBar(); renderBikes('all'); goTo('pg-select'); }, 800);
+}
+
+/* ── ZONE BAR ── */
+function buildZoneBar() {
+  const bar = document.getElementById('zone-bar');
+  bar.innerHTML = ZONES.map(z => {
+    const cnt = BIKES.filter(b => b.zone === z && b.status === 'available').length;
+    return `<div class="zone-pill" onclick="filterByZone(this,'${z}')" title="ดูจักรยานในโซน ${z}">
+      <div class="zp-icon">${ZONE_ICONS[z] || '📍'}</div>
+      <div class="zp-info">
+        <div class="zp-name">${z}</div>
+        <div class="zp-count">ว่างอยู่ · กดเพื่อดู</div>
+      </div>
+      <div class="zp-num ${cnt===0?'zero':''}">${cnt}</div>
+    </div>`;
+  }).join('');
+}
+
+function filterByZone(el, zone) {
+  // highlight active pill
+  document.querySelectorAll('.zone-pill').forEach(p => p.classList.remove('active-zone'));
+  el.classList.add('active-zone');
+
+  // reset tab highlight
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+
+  // render only bikes in this zone
+  const list = BIKES.filter(b => b.zone === zone);
+  const availCount = BIKES.filter(b=>b.status==='available').length;
+  document.getElementById('avail-sub').innerHTML =
+    `📍 มหาวิทยาลัยศิลปากร — พร้อมให้บริการ <span style="color:var(--g)">${availCount} คัน</span> จากทั้งหมด ${BIKES.length} คัน`;
+
+  const grid = document.getElementById('bike-grid');
+  grid.innerHTML = `
+    <div class="zone-section-header">
+      <span class="zsh-icon">${ZONE_ICONS[zone]||'📍'}</span>
+      <span>โซน ${zone}</span>
+      <span class="zsh-cnt">ทั้งหมด ${list.length} คัน · ว่าง ${list.filter(b=>b.status==='available').length} คัน</span>
+    </div>
+  ` + list.map(b => bikeCardHTML(b)).join('');
+
+  // scroll smoothly to grid
+  document.getElementById('bike-grid').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+/* ── BIKE CARD HTML HELPER ── */
+function bikeCardHTML(b) {
+  const ok  = b.status==='available';
+  const fix = b.status==='maintenance';
+  const badgeCls = ok ? 'ok' : fix ? 'fix' : 'busy';
+  const badgeTxt = ok ? 'ว่างอยู่' : fix ? '🔧 กำลังซ่อม' : '🔴 กำลังใช้งาน';
+  const batColor = b.bat>=60 ? 'var(--g)' : b.bat>=30 ? '#ffc107' : '#ff5252';
+  const rate = RATE[b.type];
+  const btnCls = b.type==='fast' ? 'fast-btn' : b.type==='cargo' ? 'cargo-btn' : '';
+  const zoneAvail = BIKES.filter(x => x.zone===b.zone && x.status==='available').length;
+  return `<div class="bike-card type-${b.type} ${fix?'card-fix':''}">
+    <div class="bk-top">
+      <div class="bk-emoji" style="${fix?'filter:grayscale(.7);opacity:.55':''}">${b.emoji}</div>
+      <div class="bk-type-tag ${b.type}">${TYPE_EMOJI[b.type]} ${TYPE_LABEL[b.type]}</div>
+    </div>
+    <div class="bk-name">SUBike ${b.id}</div>
+    <div class="bk-id">${b.id}</div>
+    <div class="bk-zone">📍 ${b.station} &nbsp;|&nbsp; 🏢 โซน: <span>${b.zone}</span></div>
+    <div class="badge ${badgeCls}"><span class="dot"></span>${badgeTxt}</div>
+    <div class="bk-stats">
+      <div class="bk-stat"><div class="v" style="color:${batColor}">${b.bat}%</div><div class="l">🔋 แบต</div></div>
+      <div class="bk-stat"><div class="v">${fix?'—':b.range+' km'}</div><div class="l">🛣️ ระยะ</div></div>
+      <div class="bk-stat"><div class="v">${fix?'—':'฿'+rate}</div><div class="l">💰 /กม.</div></div>
+      <div class="bk-stat"><div class="v" style="color:${zoneAvail>0?'var(--g)':'#ff5252'}">${fix?'—':zoneAvail}</div><div class="l">🚲 โซนนี้</div></div>
+    </div>
+    <button class="btn-pick ${btnCls}" ${!ok?'disabled':''} onclick="pickBike('${b.id}')">
+      ${ok ? '✅ เลือกคันนี้' : fix ? '🔧 กำลังซ่อมปรับปรุง' : '🔴 ไม่ว่าง'}
+    </button>
+  </div>`;
+}
+
+/* ── RENDER BIKES ── */
+function renderBikes(f) {
+  document.querySelectorAll('.zone-pill').forEach(p => p.classList.remove('active-zone'));
+  let list;
+  if (f==='avail')            list = BIKES.filter(b => b.status==='available');
+  else if (f==='std')         list = BIKES.filter(b => b.type==='std'   && b.status!=='maintenance');
+  else if (f==='fast')        list = BIKES.filter(b => b.type==='fast'  && b.status!=='maintenance');
+  else if (f==='cargo')       list = BIKES.filter(b => b.type==='cargo' && b.status!=='maintenance');
+  else if (f==='maintenance') list = BIKES.filter(b => b.status==='maintenance');
+  else list = BIKES;
+
+  const availCount = BIKES.filter(b=>b.status==='available').length;
+  document.getElementById('avail-sub').innerHTML =
+    `📍 มหาวิทยาลัยศิลปากร — พร้อมให้บริการ <span style="color:var(--g)">${availCount} คัน</span> จากทั้งหมด ${BIKES.length} คัน`;
+  document.getElementById('bike-grid').innerHTML = list.map(b => bikeCardHTML(b)).join('');
+}
+
+function doFilter(el, f) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');
+  renderBikes(f);
+}
+
+/* ── PICK BIKE ── */
+function pickBike(id) {
+  picked = BIKES.find(b=>b.id===id);
+  const rate = RATE[picked.type];
+  const zoneAvail = BIKES.filter(b => b.zone===picked.zone && b.status==='available').length;
+
+  document.getElementById('s-emoji').textContent   = picked.emoji;
+  document.getElementById('s-name').textContent    = 'SUBike ' + picked.id;
+  document.getElementById('s-loc').textContent     = '📍 ' + picked.station;
+  document.getElementById('s-zone').textContent    = '🏢 โซน: ' + picked.zone;
+  document.getElementById('s-bat').textContent     = picked.bat + '%';
+  document.getElementById('s-range').textContent   = picked.range + ' km';
+  document.getElementById('s-zone-cnt').textContent = zoneAvail + ' คัน';
+  document.getElementById('s-rate-num').textContent = rate;
+  document.getElementById('s-rate-price').textContent = '฿' + rate;
+  document.getElementById('s-type-label').textContent = TYPE_EMOJI[picked.type] + ' ' + TYPE_LABEL[picked.type];
+  document.getElementById('p-rate').textContent    = '฿' + rate + '.00';
+  document.getElementById('p-type-sub').textContent = TYPE_LABEL[picked.type] + ' · ฿' + rate + '/กม.';
+  goTo('pg-start');
+}
+
+/* ── START RIDE ── */
+function startRide() {
+  secs = 0;
+  clearInterval(timer);
+  updateClock();
+  goTo('pg-pay');
+  timer = setInterval(() => { secs++; updateClock(); }, 1000);
+  toast('เริ่มการเดินทางแล้ว ขับขี่ปลอดภัย! 🚲');
+}
+
+function updateClock() {
+  const h=Math.floor(secs/3600), m=Math.floor((secs%3600)/60), s=secs%60;
+  const z=n=>String(n).padStart(2,'0');
+  document.getElementById('ride-clock').textContent = `${z(h)}:${z(m)}:${z(s)}`;
+
+  const dist  = ((secs/60)*0.3).toFixed(2);
+  const rate  = picked ? RATE[picked.type] : 5;
+  const total = (parseFloat(dist)*rate).toFixed(2);
+
+  // KM hero
+  document.getElementById('ride-km').textContent    = dist;
+  document.getElementById('ride-price').textContent = '฿' + total;
+
+  // Receipt
+  if(picked) document.getElementById('p-bike').textContent = 'SUBike ' + picked.id;
+  document.getElementById('p-dur').textContent   = `${m} นาที ${s} วินาที`;
+  document.getElementById('p-dist').textContent  = dist + ' km';
+  document.getElementById('p-total').textContent = '฿' + total;
+  document.getElementById('p-btn-amt').textContent = '฿' + total;
+}
+
+/* ── PAYMENT ── */
+function pickMethod(el) {
+  document.querySelectorAll('.mth-btn').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+}
+function doPay() {
+  clearInterval(timer);
+  const m=Math.floor(secs/60), s=secs%60;
+  const dist=((secs/60)*0.3).toFixed(2);
+  document.getElementById('f-time').textContent = `${m}:${String(s).padStart(2,'0')}`;
+  document.getElementById('f-dist').textContent = dist + ' km';
+  document.getElementById('f-co2').textContent  = (parseFloat(dist)*0.15).toFixed(2) + ' kg';
+  toast('กำลังดำเนินการชำระเงิน...');
+  setTimeout(() => { goTo('pg-finish'); toast('ชำระเงินสำเร็จ! ✅'); }, 1200);
+}
+
+/* ── REVIEW ── */
+function rateStar(n) {
+  myRating=n;
+  document.querySelectorAll('.star').forEach((s,i)=>s.classList.toggle('lit',i<n));
+  document.getElementById('star-lbl').textContent = STARLBL[n];
+}
+function sendReview() {
+  if(!myRating) { toast('กรุณาให้คะแนนก่อนนะ ⭐'); return; }
+  toast(`ส่งรีวิว ${myRating} ดาวสำเร็จ! ขอบคุณมาก 🙏`);
+  setTimeout(() => {
+    myRating=0; picked=null; secs=0;
+    document.getElementById('r-txt').value='';
+    document.getElementById('star-lbl').textContent='แตะดาวเพื่อให้คะแนน';
+    document.querySelectorAll('.star').forEach(s=>s.classList.remove('lit'));
+    document.getElementById('ride-clock').textContent='00:00:00';
+    document.getElementById('ride-km').textContent='0.00';
+    document.getElementById('ride-price').textContent='฿0.00';
+    buildZoneBar(); renderBikes('all');
+    goTo('pg-select');
+  }, 1800);
+}
+</script>
+</body>
+</html>
