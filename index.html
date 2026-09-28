@@ -532,7 +532,7 @@ function bikeCardHTML(b) {
       <div class="bk-emoji" style="${fix?'filter:grayscale(.7);opacity:.55':''}">${b.emoji}</div>
       <div class="bk-type-tag ${b.type}">${TYPE_EMOJI[b.type]} ${TYPE_LABEL[b.type]}</div>
     </div>
-    <div class="bk-name">Bike for U ${b.id}</div>
+    <div class="bk-name">${b.id}</div>
     <div class="bk-id">${b.id}</div>
     <div class="bk-zone">📍 ${b.station} &nbsp;|&nbsp; 🏢 โซน: <span>${b.zone}</span></div>
     <div class="badge ${badgeCls}"><span class="dot"></span>${badgeTxt}</div>
