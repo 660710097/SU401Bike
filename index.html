@@ -377,7 +377,7 @@ html, body { width:100%; font-family:'Kanit',sans-serif; background:#0f1117; col
   <div class="finish-wrap">
     <div class="ok-ring">✅</div>
     <div class="fin-title">ชำระเงินสำเร็จ! 🎉</div>
-    <div class="fin-sub">ขอบคุณที่ใช้บริการ SUBike<br>มหาวิทยาลัยศิลปากร</div>
+    <div class="fin-sub">ขอบคุณที่ใช้บริการ Bike for U<br>มหาวิทยาลัยศิลปากร</div>
     <div class="stats-row">
       <div class="sbox"><div class="sv" id="f-time">0:00</div><div class="sl">⏱️ เวลา</div></div>
       <div class="sbox"><div class="sv" id="f-dist">0.00 km</div><div class="sl">🛣️ ระยะทาง</div></div>
@@ -532,7 +532,7 @@ function bikeCardHTML(b) {
       <div class="bk-emoji" style="${fix?'filter:grayscale(.7);opacity:.55':''}">${b.emoji}</div>
       <div class="bk-type-tag ${b.type}">${TYPE_EMOJI[b.type]} ${TYPE_LABEL[b.type]}</div>
     </div>
-    <div class="bk-name">SUBike ${b.id}</div>
+    <div class="bk-name">Bike for U ${b.id}</div>
     <div class="bk-id">${b.id}</div>
     <div class="bk-zone">📍 ${b.station} &nbsp;|&nbsp; 🏢 โซน: <span>${b.zone}</span></div>
     <div class="badge ${badgeCls}"><span class="dot"></span>${badgeTxt}</div>
@@ -578,7 +578,7 @@ function pickBike(id) {
   const zoneAvail = BIKES.filter(b => b.zone===picked.zone && b.status==='available').length;
 
   document.getElementById('s-emoji').textContent   = picked.emoji;
-  document.getElementById('s-name').textContent    = 'SUBike ' + picked.id;
+  document.getElementById('s-name').textContent    = 'Bike for U ' + picked.id;
   document.getElementById('s-loc').textContent     = '📍 ' + picked.station;
   document.getElementById('s-zone').textContent    = '🏢 โซน: ' + picked.zone;
   document.getElementById('s-bat').textContent     = picked.bat + '%';
@@ -616,7 +616,7 @@ function updateClock() {
   document.getElementById('ride-price').textContent = '฿' + total;
 
   // Receipt
-  if(picked) document.getElementById('p-bike').textContent = 'SUBike ' + picked.id;
+  if(picked) document.getElementById('p-bike').textContent = 'Bike for U ' + picked.id;
   document.getElementById('p-dur').textContent   = `${m} นาที ${s} วินาที`;
   document.getElementById('p-dist').textContent  = dist + ' km';
   document.getElementById('p-total').textContent = '฿' + total;
